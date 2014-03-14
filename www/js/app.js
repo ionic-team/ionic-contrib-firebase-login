@@ -17,8 +17,13 @@ angular.module('starter', ['ionic', 'firebase'])
   $stateProvider
 
     // setup an abstract state for the tabs directive
-    .state('login', {
+    .state('splash', {
       url: "/",
+      templateUrl: "templates/splash.html"
+    })
+
+    .state('login', {
+      url: "/login",
       templateUrl: "templates/login.html",
       controller: 'LoginCtrl'
     })
@@ -41,6 +46,28 @@ angular.module('starter', ['ionic', 'firebase'])
 
 })
 
+.run(function($rootScope, $firebaseSimpleLogin, $state) {
+
+  var dataRef = new Firebase("https://ionic-firebase-login.firebaseio.com/");
+  var loginObj = $firebaseSimpleLogin(dataRef);
+
+  loginObj.$getCurrentUser().then(function(user) {
+    if(!user){ 
+      // Might already be handled by logout event below
+      $state.go('login');
+    }
+  }, function(err) {
+  });
+
+  $rootScope.$on('$firebaseSimpleLogin:login', function(e, user) {
+    $state.go('home');
+  });
+
+  $rootScope.$on('$firebaseSimpleLogin:logout', function(e, user) {
+    $state.go('login');
+  });
+})
+
 .controller('LoginCtrl', function($scope, $firebaseSimpleLogin) {
   $scope.loginData = {};
 
@@ -48,13 +75,16 @@ angular.module('starter', ['ionic', 'firebase'])
   $scope.loginObj = $firebaseSimpleLogin(dataRef);
 
   $scope.tryLogin = function() {
-    console.log('Logging in', $scope.loginData);
     $scope.loginObj.$login('facebook').then(function(user) {
-      console.log('Logged in!', user);
+      // The root scope event will trigger and navigate
     }, function(error) {
+      // Show a form error here
       console.error('Unable to login', error);
     });
   };
+})
+
+.controller('SignupCtrl', function($scope) {
 })
 
 .controller('HomeCtrl', function($scope) {
