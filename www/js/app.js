@@ -35,7 +35,7 @@ angular.module('starter', ['ionic', 'firebase'])
     })
 
     // the pet tab has its own child nav-view and history
-    .state('home', {
+    .state('home_landing', {
       url: '/home',
       templateUrl: 'templates/home.html',
       controller: 'HomeCtrl'
@@ -46,7 +46,7 @@ angular.module('starter', ['ionic', 'firebase'])
 
 })
 
-.run(function($rootScope, $firebaseSimpleLogin, $state) {
+.run(function($rootScope, $firebaseSimpleLogin, $state, $window) {
 
   var dataRef = new Firebase("https://ionic-firebase-login.firebaseio.com/");
   var loginObj = $firebaseSimpleLogin(dataRef);
@@ -60,10 +60,11 @@ angular.module('starter', ['ionic', 'firebase'])
   });
 
   $rootScope.$on('$firebaseSimpleLogin:login', function(e, user) {
-    $state.go('home');
+    $state.go('home_landing');
   });
 
   $rootScope.$on('$firebaseSimpleLogin:logout', function(e, user) {
+    console.log($state);
     $state.go('login');
   });
 })
